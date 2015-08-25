@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NewShWeb</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div align="center">
+            <form method="POST" action="upload" enctype="multipart/form-data" >
+                Diploma of:
+                <select name="nameofdip">
+                    <option value="1">Спецiалiста</option>
+                    <option value="2">Бакалавра</option>
+                    <option value="3">Магiстра</option>
+                </select> <br/>
+                File XML:
+                <input type="file" name="xmlfile" id="xmlfile" /> <br/>
+                File Word:
+                <input type="file" name="wordfile" id="wordfile" /> <br/>
+                GroupName:
+                <input type="text" name="group"/> </br>
+                ST:
+                <input type="radio" name="st" value="true" />Yes
+                <input type="radio" name="st" value="false" />No<br/>
+                <input type="submit" value="Upload" name="upload" id="upload" />
+            </form>
+        </div>
+    </body>
+</html>
