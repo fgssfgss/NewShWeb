@@ -44,11 +44,18 @@ public class TemplateEngine extends Thread {
     private String docFileName = "";
     public String groupName = "";
 
-    public void work(String wordPath, String xmlPath, String outPath, String groupName) {
+    public void work(String wordPath, String xmlPath, String outPath, String groupName, String nameOfDip, boolean st_gr) {
         final String PATH = "/home/fgss/NetBeansProjects/NewShWeb/doc/";
-        String templateFileName = PATH + "sh13.docx";
+        String templateFileNameN = PATH + "sh13.docx";
         String templateFileNameST = PATH + "sh13_st.docx";
 
+        switch(Integer.valueOf(nameOfDip)){
+            case 1: this.nameOfDiploma = "Спецiалiста"; break;
+            case 2: this.nameOfDiploma = "Бакалавра"; break;
+            case 3: this.nameOfDiploma = "Магiстра"; break;
+        }
+        
+        this.st = st_gr;
         this.groupName = groupName;
         MyLogger.log(wordPath);
         MyLogger.log(xmlPath);
@@ -62,7 +69,7 @@ public class TemplateEngine extends Thread {
         if (st) {
             setTemplateFileName(templateFileNameST);
         } else {
-            setTemplateFileName(templateFileName);
+            setTemplateFileName(templateFileNameN);
         }
         setXmlFileName(xmlPath);
         start();
@@ -79,6 +86,10 @@ public class TemplateEngine extends Thread {
     
     public synchronized int getProgress() {
         return progressOfJob;
+    }
+    
+    public synchronized int getMaxProgress() {
+        return maxProgress;
     }
 
     public synchronized boolean isReady() {

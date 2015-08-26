@@ -47,31 +47,29 @@ public class Main extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        System.out.println(request.getServletPath());
         if (request.getServletPath().equals("/get")) {
-            for (Cookie c : request.getCookies()) {
-                if (c.getName().equals("group_param")) {
-                    response.setHeader("Content-Disposition", "attachment;filename=".concat(c.getValue().concat(".zip")));
-                    OutputStream out = response.getOutputStream();
-                    FileInputStream in = new FileInputStream("/tmp/"+c.getValue()+".zip");
-                    byte[] buffer = new byte[4096];
-                    int length;
-                    while ((length = in.read(buffer)) > 0) {
-                        out.write(buffer, 0, length);
-                    }
-                    in.close();
-                    out.flush();
-                }
+            String filename = request.getParameter("file");
+            response.setHeader("Content-Disposition", "attachment;filename=".concat(filename.concat(".zip")));
+            OutputStream out = response.getOutputStream();
+            FileInputStream in = new FileInputStream("/tmp/" + filename + ".zip");
+            byte[] buffer = new byte[4096];
+            int length;
+            while ((length = in.read(buffer)) > 0) {
+                out.write(buffer, 0, length);
             }
+            in.close();
+            out.flush();
+
         } else {
             for (Cookie c : request.getCookies()) {
                 if (c.getName().equals("group_param")) {
                     if (tempEngine.groupName.equals(c.getValue()) && tempEngine.isReady()) {
-                        response.getWriter().print("<p>Your job is done, link to download is <a href=\"/WebNewSupp/get\">here</a></p>");
+                        response.getWriter().print("<p>Your job is done, link to download is <a href=\"/WebNewSupp/get?file=" + c.getValue() + "\">here</a></p>");
                         return;
                     } else {
                         response.getWriter().print("<p>Your job is running now</p>");
+                        response.getWriter().print("<br/>");
+                        response.getWriter().print("<p>Progress is "+ String.valueOf(tempEngine.getProgress()) +"/"+ String.valueOf(tempEngine.getMaxProgress()) +"</p>");
                         return;
                     }
                 }
@@ -93,6 +91,13 @@ public class Main extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        if(!request.getServletPath().equals("/upload"))
+        {
+            return;
+        }
+        
+        String nameOfDiplom = request.getParameter("nameofdip");
+        String st = request.getParameter("st");
         String group = request.getParameter("group");
         Cookie cookie = new Cookie("group_param", group);
         response.addCookie(cookie);
@@ -107,7 +112,7 @@ public class Main extends HttpServlet {
         File fWord = File.createTempFile(group, fileNameWord);
         Files.copy(filePart.getInputStream(), fWord.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-        tempEngine.work(fWord.getAbsolutePath(), fXML.getAbsolutePath(), Files.createTempDirectory(group).toString(), group);
+        tempEngine.work(fWord.getAbsolutePath(), fXML.getAbsolutePath(), Files.createTempDirectory(group).toString(), group, nameOfDiplom, Boolean.parseBoolean(st));
 
         try (PrintWriter pw = response.getWriter()) {
             pw.print("<!DOCTYPE html><html><body><script>window.location.replace(\"/WebNewSupp/result.html\");</script></body></html>");
